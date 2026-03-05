@@ -4,6 +4,7 @@
 -- ============================================================
 
 
+
 -- TABLA: USUARIO
 CREATE TABLE USUARIO (
     ID_USER           VARCHAR2(10)   PRIMARY KEY,
