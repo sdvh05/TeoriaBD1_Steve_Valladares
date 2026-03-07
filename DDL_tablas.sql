@@ -3,7 +3,7 @@
 -- Steve Valladares - 22341344
 -- ============================================================
 
-
+--sqlplus system/OracleTBD@localhost:1521/XE @"C:\Users\EzTiB\TBD1_Proyecto\SQL\DDL_tablas.sql"
 
 -- TABLA: USUARIO
 CREATE TABLE USUARIO (
@@ -17,7 +17,7 @@ CREATE TABLE USUARIO (
     FECHA_REGISTRO    DATE           DEFAULT SYSDATE,
     SALARIO_BASE      DECIMAL(10,2)  DEFAULT 0,
     ESTADO            NUMBER(1)      DEFAULT 1 CHECK (ESTADO IN (0,1))
-);
+); 
 
 -- TABLA: PRESUPUESTO
 CREATE TABLE PRESUPUESTO (
