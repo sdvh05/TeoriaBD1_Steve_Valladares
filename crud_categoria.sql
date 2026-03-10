@@ -1,0 +1,133 @@
+
+-- sqlplus system/OracleTBD@localhost:1521/XE @"...\database\procedimientos\crud_categoria.sql"
+
+
+-- >> CREATE
+-- ---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_INSERTAR_CATEGORIA (
+    P_NOMBRE         IN  CATEGORIA.NOMBRE%TYPE,
+    P_DESCRIPCION    IN  CATEGORIA.DESCRIPCION%TYPE,
+    P_TIPO           IN  CATEGORIA.TIPO%TYPE,
+    P_NOMBRE_ICON_UI IN  CATEGORIA.NOMBRE_ICON_UI%TYPE,
+    P_COLOR_HEX      IN  CATEGORIA.COLOR_HEX%TYPE,
+    P_ORDEN          IN  CATEGORIA.ORDEN%TYPE,
+    P_ID_GENERADO    OUT CATEGORIA.ID_CATEGORIA%TYPE
+) AS
+BEGIN
+    IF TRIM(P_NOMBRE) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20110, 'El nombre de la categoria es obligatorio.');
+    END IF;
+    IF P_TIPO NOT IN ('ingreso','gasto','ahorro') THEN
+        RAISE_APPLICATION_ERROR(-20111, 'Tipo invalido. Valores: ingreso, gasto, ahorro.');
+    END IF;
+    IF P_ORDEN < 0 THEN
+        RAISE_APPLICATION_ERROR(-20112, 'El orden no puede ser negativo.');
+    END IF;
+
+    INSERT INTO CATEGORIA (
+        ID_CATEGORIA, NOMBRE, DESCRIPCION,
+        TIPO, NOMBRE_ICON_UI, COLOR_HEX, ORDEN
+    ) VALUES (
+        NULL, P_NOMBRE, P_DESCRIPCION,
+        P_TIPO, P_NOMBRE_ICON_UI, P_COLOR_HEX, P_ORDEN
+    ) RETURNING ID_CATEGORIA INTO P_ID_GENERADO;
+    -- TRG_SUBCAT_DEFECTO crea la subcategoria "General" automaticamente aqui
+    COMMIT;
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Ya existe una categoria con ese ID.');
+    WHEN OTHERS THEN ROLLBACK; RAISE;
+END SP_INSERTAR_CATEGORIA;
+/
+
+-- >> READ (uno por ID)
+-- ---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_CONSULTAR_CATEGORIA (
+    P_ID_CATEGORIA IN  CATEGORIA.ID_CATEGORIA%TYPE,
+    P_CURSOR       OUT SYS_REFCURSOR
+) AS
+BEGIN
+    OPEN P_CURSOR FOR
+        SELECT * FROM CATEGORIA WHERE ID_CATEGORIA = P_ID_CATEGORIA;
+END SP_CONSULTAR_CATEGORIA;
+/
+
+-- >> READ (todos — P_TIPO = NULL retorna todas)
+-- ---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_LISTAR_CATEGORIAS (
+    P_TIPO   IN  VARCHAR2,
+    P_CURSOR OUT SYS_REFCURSOR
+) AS
+BEGIN
+    IF P_TIPO IS NULL THEN
+        OPEN P_CURSOR FOR
+            SELECT * FROM CATEGORIA ORDER BY ORDEN, NOMBRE;
+    ELSE
+        OPEN P_CURSOR FOR
+            SELECT * FROM CATEGORIA
+            WHERE TIPO = P_TIPO ORDER BY ORDEN, NOMBRE;
+    END IF;
+END SP_LISTAR_CATEGORIAS;
+/
+
+-- >> UPDATE
+-- ---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_ACTUALIZAR_CATEGORIA (
+    P_ID_CATEGORIA IN CATEGORIA.ID_CATEGORIA%TYPE,
+    P_NOMBRE       IN CATEGORIA.NOMBRE%TYPE,
+    P_DESCRIPCION  IN CATEGORIA.DESCRIPCION%TYPE,
+    P_COLOR_HEX    IN CATEGORIA.COLOR_HEX%TYPE,
+    P_ORDEN        IN CATEGORIA.ORDEN%TYPE
+) AS
+BEGIN
+    IF TRIM(P_NOMBRE) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20110, 'El nombre de la categoria es obligatorio.');
+    END IF;
+    IF P_ORDEN < 0 THEN
+        RAISE_APPLICATION_ERROR(-20112, 'El orden no puede ser negativo.');
+    END IF;
+
+    UPDATE CATEGORIA SET
+        NOMBRE      = P_NOMBRE,
+        DESCRIPCION = P_DESCRIPCION,
+        COLOR_HEX   = P_COLOR_HEX,
+        ORDEN       = P_ORDEN
+    WHERE ID_CATEGORIA = P_ID_CATEGORIA;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'No se encontro la categoria: ' || P_ID_CATEGORIA);
+    END IF;
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN ROLLBACK; RAISE;
+END SP_ACTUALIZAR_CATEGORIA;
+/
+
+-- >> DELETE (no permitido si tiene transacciones asociadas)
+-- ---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_ELIMINAR_CATEGORIA (
+    P_ID_CATEGORIA IN CATEGORIA.ID_CATEGORIA%TYPE
+) AS
+    V_TIENE_TRX NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO V_TIENE_TRX
+    FROM   TRANSACCION T
+    JOIN   SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+    WHERE  S.ID_CATEGORIA = P_ID_CATEGORIA;
+
+    IF V_TIENE_TRX > 0 THEN
+        RAISE_APPLICATION_ERROR(-20113,
+            'No se puede eliminar: la categoria tiene ' || V_TIENE_TRX || ' transaccion(es) asociada(s).');
+    END IF;
+
+    DELETE FROM SUBCATEGORIA WHERE ID_CATEGORIA = P_ID_CATEGORIA;
+    DELETE FROM CATEGORIA    WHERE ID_CATEGORIA = P_ID_CATEGORIA;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'No se encontro la categoria: ' || P_ID_CATEGORIA);
+    END IF;
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN ROLLBACK; RAISE;
+END SP_ELIMINAR_CATEGORIA;
+/
