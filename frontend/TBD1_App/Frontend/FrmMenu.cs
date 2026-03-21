@@ -177,10 +177,14 @@ namespace TBD1_App.Frontend
                 "Gestionar pagos fijos\nmensuales recurrentes",
                 COLOR_OBL, () => AbrirForm("obligacion"));
 
-            // Tarjeta perfil — fila 2 centrada
-            CrearTarjetaModulo(265, 470, "👤", "Mi Perfil",
+            // Tarjeta perfil + reportes — fila 2
+            CrearTarjetaModulo(30,  470, "👤", "Mi Perfil",
                 "Ver y actualizar tu\ninformación personal",
                 TEXT_MUTED, () => AbrirForm("perfil"));
+
+            CrearTarjetaModulo(265, 470, "📈", "Reportes",
+                "Análisis y gráficas\nde tu situación financiera",
+                Color.FromArgb(167, 139, 250), () => AbrirForm("reportes"));
         }
 
         // ── Crea tarjeta de dato rápido ────────────────────
@@ -358,6 +362,7 @@ namespace TBD1_App.Frontend
                 case "categoria": new FrmCategorias(_usuario).ShowDialog(this); break;
                 case "obligacion": new FrmObligaciones(_usuario).ShowDialog(this); CargarDatos(); break;
                 case "perfil": new FrmPerfil(_usuario).ShowDialog(this); break;
+                case "reportes": new FrmReportes(_usuario).ShowDialog(this); break;
                 default:
                     MessageBox.Show($"Módulo '{modulo}' próximamente.",
                         "En construcción", MessageBoxButtons.OK, MessageBoxIcon.Information);
