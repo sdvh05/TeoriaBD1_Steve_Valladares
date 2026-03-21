@@ -96,24 +96,25 @@ namespace TBD1_App.Frontend
             };
             pnlHeader.Controls.Add(lblSaludo);
 
-            // Fecha y salario
+            // Fecha y salario — centrado en el header
             var lblFecha = new Label
             {
                 Text      = $"{DateTime.Now:dddd, dd MMMM yyyy}  •  Salario base: L {_usuario.SalarioBase:N2}",
                 Font      = new Font("Segoe UI", 9.5f),
                 ForeColor = TEXT_MUTED,
                 AutoSize  = true,
-                Location  = new Point(650, 38)
+                Location  = new Point(400, 38),
+                TextAlign = ContentAlignment.MiddleCenter
             };
             pnlHeader.Controls.Add(lblFecha);
 
-            // Botón cerrar sesión
+            // Botón cerrar sesión — derecha sin solapar
             var btnSalir = new Button
             {
                 Text      = "Cerrar sesión",
                 Font      = new Font("Segoe UI", 9f),
                 Size      = new Size(110, 30),
-                Location  = new Point(870, 30),
+                Location  = new Point(875, 55),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(40, 248, 81, 73),
                 ForeColor = Color.FromArgb(248, 81, 73),
@@ -141,11 +142,10 @@ namespace TBD1_App.Frontend
             };
             this.Controls.Add(lblSecDatos);
 
-            // 4 tarjetas de datos
-            CrearTarjetaDato(30,  135, "INGRESOS DEL MES",  "Cargando...", COLOR_ING, out lblIngresosVal);
-            CrearTarjetaDato(255, 135, "GASTOS DEL MES",    "Cargando...", COLOR_GAS, out lblGastosVal);
-            CrearTarjetaDato(480, 135, "BALANCE",           "Cargando...", ACCENT,    out lblBalanceVal);
-            CrearTarjetaDato(705, 135, "PRÓX. OBLIGACIÓN",  "Cargando...", COLOR_OBL, out lblObligacionVal);
+            // 3 tarjetas de datos
+            CrearTarjetaDato(20,  135, "BALANCE DEL MES",   "Cargando...", ACCENT,    out lblBalanceVal);
+            CrearTarjetaDato(350, 135, "AHORROS DEL MES",   "Cargando...", COLOR_ING, out lblIngresosVal);
+            CrearTarjetaDato(680, 135, "PRÓX. OBLIGACIÓN",  "Cargando...", COLOR_OBL, out lblObligacionVal);
 
             // ════════════════════════════════════════════════
             // SECCIÓN MÓDULOS
@@ -160,29 +160,29 @@ namespace TBD1_App.Frontend
             };
             this.Controls.Add(lblSecModulos);
 
-            // Tarjetas de navegación — fila 1
+            // Tarjetas de navegación — fila 1 (3 módulos)
             CrearTarjetaModulo(30,  270, "💰", "Presupuestos",
                 "Crear y gestionar presupuestos\nmensuales o por período",
                 ACCENT, () => AbrirForm("presupuesto"));
 
-            CrearTarjetaModulo(265, 270, "📊", "Transacciones",
+            CrearTarjetaModulo(345, 270, "📊", "Transacciones",
                 "Registrar ingresos, gastos\ny ahorros del mes",
                 COLOR_ING, () => AbrirForm("transaccion"));
 
-            CrearTarjetaModulo(500, 270, "🗂️", "Categorías",
+            CrearTarjetaModulo(660, 270, "🗂️", "Categorías",
                 "Administrar categorías\ny subcategorías",
                 Color.FromArgb(167, 139, 250), () => AbrirForm("categoria"));
 
-            CrearTarjetaModulo(735, 270, "📋", "Obligaciones",
+            // Tarjetas de navegación — fila 2 (3 módulos)
+            CrearTarjetaModulo(30,  460, "📋", "Obligaciones",
                 "Gestionar pagos fijos\nmensuales recurrentes",
                 COLOR_OBL, () => AbrirForm("obligacion"));
 
-            // Tarjeta perfil + reportes — fila 2
-            CrearTarjetaModulo(30,  470, "👤", "Mi Perfil",
+            CrearTarjetaModulo(345, 460, "👤", "Mi Perfil",
                 "Ver y actualizar tu\ninformación personal",
                 TEXT_MUTED, () => AbrirForm("perfil"));
 
-            CrearTarjetaModulo(265, 470, "📈", "Reportes",
+            CrearTarjetaModulo(660, 460, "📈", "Reportes",
                 "Análisis y gráficas\nde tu situación financiera",
                 Color.FromArgb(167, 139, 250), () => AbrirForm("reportes"));
         }
@@ -192,7 +192,7 @@ namespace TBD1_App.Frontend
         {
             var pnl = new Panel
             {
-                Size      = new Size(210, 85),
+                Size      = new Size(300, 90),
                 Location  = new Point(x, y),
                 BackColor = BG_CARD
             };
@@ -218,11 +218,11 @@ namespace TBD1_App.Frontend
             lblValor = new Label
             {
                 Text      = valorInicial,
-                Font      = new Font("Segoe UI", 14f, FontStyle.Bold),
+                Font      = new Font("Segoe UI", 16f, FontStyle.Bold),
                 ForeColor = accentColor,
                 AutoSize  = false,
-                Size      = new Size(190, 40),
-                Location  = new Point(12, 35),
+                Size      = new Size(280, 44),
+                Location  = new Point(12, 36),
                 TextAlign = ContentAlignment.MiddleLeft
             };
             pnl.Controls.Add(lblValor);
@@ -233,7 +233,7 @@ namespace TBD1_App.Frontend
         {
             var pnl = new Panel
             {
-                Size      = new Size(215, 170),
+                Size      = new Size(295, 165),
                 Location  = new Point(x, y),
                 BackColor = BG_CARD,
                 Cursor    = Cursors.Hand
@@ -304,46 +304,54 @@ namespace TBD1_App.Frontend
                 int anio = DateTime.Now.Year;
                 int mes  = DateTime.Now.Month;
 
-                // Balance del mes via SP_CALCULAR_BALANCE_MENSUAL
-                var pIngresos = new Oracle.ManagedDataAccess.Client.OracleParameter("P_TOTAL_INGRESOS", Oracle.ManagedDataAccess.Client.OracleDbType.Decimal) { Direction = System.Data.ParameterDirection.Output };
-                var pGastos   = new Oracle.ManagedDataAccess.Client.OracleParameter("P_TOTAL_GASTOS",   Oracle.ManagedDataAccess.Client.OracleDbType.Decimal) { Direction = System.Data.ParameterDirection.Output };
-                var pAhorros  = new Oracle.ManagedDataAccess.Client.OracleParameter("P_TOTAL_AHORROS",  Oracle.ManagedDataAccess.Client.OracleDbType.Decimal) { Direction = System.Data.ParameterDirection.Output };
-                var pBalance  = new Oracle.ManagedDataAccess.Client.OracleParameter("P_BALANCE",        Oracle.ManagedDataAccess.Client.OracleDbType.Decimal) { Direction = System.Data.ParameterDirection.Output };
+                // Query directa — suma todas las transacciones del mes sin filtrar por presupuesto
+                var dt = OracleHelper.ExecuteQuery(@"
+                    SELECT
+                        NVL(SUM(CASE WHEN TIPO = 'ingreso' THEN MONTO ELSE 0 END), 0) AS INGRESOS,
+                        NVL(SUM(CASE WHEN TIPO = 'gasto'   THEN MONTO ELSE 0 END), 0) AS GASTOS,
+                        NVL(SUM(CASE WHEN TIPO = 'ahorro'  THEN MONTO ELSE 0 END), 0) AS AHORROS
+                    FROM TRANSACCION
+                    WHERE ID_USER = :u
+                      AND ANIO    = :a
+                      AND MES     = :m",
+                    new Oracle.ManagedDataAccess.Client.OracleParameter("u", _usuario.IdUser),
+                    new Oracle.ManagedDataAccess.Client.OracleParameter("a", anio),
+                    new Oracle.ManagedDataAccess.Client.OracleParameter("m", mes));
 
-                OracleHelper.ExecuteProcedure("SP_CALCULAR_BALANCE_MENSUAL",
-                    new Oracle.ManagedDataAccess.Client.OracleParameter("P_ID_USER", _usuario.IdUser),
-                    new Oracle.ManagedDataAccess.Client.OracleParameter("P_ANIO", anio),
-                    new Oracle.ManagedDataAccess.Client.OracleParameter("P_MES",  mes),
-                    pIngresos, pGastos, pAhorros, pBalance);
+                decimal ingresos = Convert.ToDecimal(dt.Rows[0]["INGRESOS"]);
+                decimal gastos   = Convert.ToDecimal(dt.Rows[0]["GASTOS"]);
+                decimal ahorros  = Convert.ToDecimal(dt.Rows[0]["AHORROS"]);
+                decimal balance  = ingresos - gastos;
 
-                decimal ingresos = pIngresos.Value == DBNull.Value ? 0 : Convert.ToDecimal(pIngresos.Value.ToString());
-                decimal gastos   = pGastos.Value   == DBNull.Value ? 0 : Convert.ToDecimal(pGastos.Value.ToString());
-                decimal balance  = pBalance.Value  == DBNull.Value ? 0 : Convert.ToDecimal(pBalance.Value.ToString());
-
-                lblIngresosVal.Text     = $"L {ingresos:N2}";
-                lblGastosVal.Text       = $"L {gastos:N2}";
                 lblBalanceVal.Text      = $"L {balance:N2}";
                 lblBalanceVal.ForeColor = balance >= 0 ? COLOR_ING : COLOR_GAS;
+                lblIngresosVal.Text     = $"L {ahorros:N2}";
 
-                // Próxima obligación
+                // Próxima obligación — ordenar por días más cercanos
                 var obligaciones = _oblDAO.ObtenerActivas(_usuario.IdUser);
                 if (obligaciones.Count > 0)
                 {
-                    obligaciones.Sort((a, b) => a.Dia.CompareTo(b.Dia));
+                    obligaciones.Sort((a, b) => a.DiasVencimiento.CompareTo(b.DiasVencimiento));
                     var prox = obligaciones[0];
-                    lblObligacionVal.Text = $"{prox.Nombre}\nDía {prox.Dia}  L {prox.Monto:N2}";
-                    lblObligacionVal.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
+                    string diasStr = prox.DiasVencimiento < 0  ? "¡Vencida!" :
+                                     prox.DiasVencimiento == 0 ? "¡Hoy!" :
+                                     prox.DiasVencimiento == 1 ? "¡Mañana!" :
+                                     $"en {prox.DiasVencimiento} días";
+                    lblObligacionVal.Text      = $"{prox.Nombre} — L {prox.Monto:N2}\nDía {prox.Dia}  •  {diasStr}";
+                    lblObligacionVal.Font      = new Font("Segoe UI", 9f, FontStyle.Bold);
+                    lblObligacionVal.ForeColor = prox.DiasVencimiento <= 3 ? COLOR_GAS :
+                                                 prox.DiasVencimiento <= 7 ? Color.FromArgb(251, 146, 60) : COLOR_OBL;
                 }
                 else
                 {
-                    lblObligacionVal.Text = "Sin obligaciones";
+                    lblObligacionVal.Text      = "Sin obligaciones activas";
+                    lblObligacionVal.ForeColor = COLOR_OBL;
                 }
             }
             catch
             {
-                lblIngresosVal.Text   = "L 0.00";
-                lblGastosVal.Text     = "L 0.00";
                 lblBalanceVal.Text    = "L 0.00";
+                lblIngresosVal.Text   = "L 0.00";
                 lblObligacionVal.Text = "Sin datos";
             }
         }
