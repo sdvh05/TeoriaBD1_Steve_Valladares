@@ -2,7 +2,6 @@
 -- sqlplus system/OracleTBD@localhost:1521/XE @"C:\Users\EzTiB\source\repos\TBD1_Proyecto\TBD1_Proyecto\SQL\triggers.sql"
 
 
-
 CREATE OR REPLACE TRIGGER TRG_SUBCAT_DEFECTO
 AFTER INSERT ON CATEGORIA
 FOR EACH ROW
@@ -15,7 +14,7 @@ BEGIN
         ACTIVA,
         SUB_POR_DEFECTO
     ) VALUES (
-        NULL,   -- TRG_ID_SUBCATEGORIA asigna el ID automáticamente
+        NULL,  
         :NEW.ID_CATEGORIA,
         'General',
         'Subcategoría por defecto de ' || :NEW.NOMBRE,
@@ -25,9 +24,8 @@ BEGIN
 END TRG_SUBCAT_DEFECTO;
 /
 
--- ─────────────────────────────────────────
--- Valida que la fecha de la transacción este dentro del periodo del presupuesto
--- ─────────────────────────────────────────
+
+--transacción este dentro del periodo del presupuesto
 CREATE OR REPLACE TRIGGER TRG_VALIDAR_PERIODO_TRANSACCION
 BEFORE INSERT ON TRANSACCION
 FOR EACH ROW
@@ -48,9 +46,8 @@ BEGIN
 END TRG_VALIDAR_PERIODO_TRANSACCION;
 /
 
--- ─────────────────────────────────────────
+
 -- coincidan transsaccion y subcat
--- ─────────────────────────────────────────
 CREATE OR REPLACE TRIGGER TRG_VALIDAR_TIPO_TRANSACCION
 BEFORE INSERT ON TRANSACCION
 FOR EACH ROW
@@ -58,8 +55,8 @@ DECLARE
     V_TIPO_SUBCAT VARCHAR2(10);
 BEGIN
     SELECT C.TIPO INTO V_TIPO_SUBCAT
-    FROM   SUBCATEGORIA S
-    JOIN   CATEGORIA    C ON S.ID_CATEGORIA = C.ID_CATEGORIA
+    FROM SUBCATEGORIA S
+    INNER JOIN CATEGORIA C ON S.ID_CATEGORIA = C.ID_CATEGORIA
     WHERE  S.ID_SUBCATEGORIA = :NEW.ID_SUBCATEGORIA;
 
     IF V_TIPO_SUBCAT != :NEW.TIPO THEN
