@@ -1,8 +1,10 @@
 📁 Proyecto: Presupuesto Personal (C# WinForms)
 Este archivo contiene el código fuente completo de una aplicación de escritorio para gestión financiera personal. El proyecto fue desarrollado en C# con Windows Forms y utiliza Oracle Database como motor de datos, además de iTextSharp para la generación de reportes en PDF.
 
+
 📋 Contenido del ZIP
-TODO el proyecto competo
+TODO EL CODIGO FUENTE
+(No se pudieron subir los packages), pero esos los instala cada quien con los requisitos
 
 🖥️ Requisitos para compilar
 1. Software necesario
