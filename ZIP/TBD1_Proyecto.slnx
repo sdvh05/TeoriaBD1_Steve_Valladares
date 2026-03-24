@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="TBD1_App/TBD1_App.csproj" Id="a4d6f98f-ff85-4362-ada5-751301a66c09" />
+  <Project Path="TBD1_Proyecto/TBD1_Proyecto.sqlproj" Id="c46dbc11-5e82-40fb-ba60-837a9a469da4">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
