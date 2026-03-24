@@ -2,23 +2,22 @@
 -- sqlplus system/OracleTBD@localhost:1521/XE @"...\database\procedimientos\crud_categoria.sql"
 
 
--- >> CREATE
--- ---------------------------------------------------------
+-- CREATE
 CREATE OR REPLACE PROCEDURE SP_INSERTAR_CATEGORIA (
-    P_NOMBRE         IN  CATEGORIA.NOMBRE%TYPE,
-    P_DESCRIPCION    IN  CATEGORIA.DESCRIPCION%TYPE,
-    P_TIPO           IN  CATEGORIA.TIPO%TYPE,
-    P_NOMBRE_ICON_UI IN  CATEGORIA.NOMBRE_ICON_UI%TYPE,
-    P_COLOR_HEX      IN  CATEGORIA.COLOR_HEX%TYPE,
-    P_ORDEN          IN  CATEGORIA.ORDEN%TYPE,
-    P_ID_GENERADO    OUT CATEGORIA.ID_CATEGORIA%TYPE
+    P_NOMBRE IN CATEGORIA.NOMBRE%TYPE,
+    P_DESCRIPCION IN CATEGORIA.DESCRIPCION%TYPE,
+    P_TIPO IN CATEGORIA.TIPO%TYPE,
+    P_NOMBRE_ICON_UI IN CATEGORIA.NOMBRE_ICON_UI%TYPE,
+    P_COLOR_HEX IN CATEGORIA.COLOR_HEX%TYPE,
+    P_ORDEN IN CATEGORIA.ORDEN%TYPE,
+    P_ID_GENERADO OUT CATEGORIA.ID_CATEGORIA%TYPE
 ) AS
 BEGIN
     IF TRIM(P_NOMBRE) IS NULL THEN
-        RAISE_APPLICATION_ERROR(-20110, 'El nombre de la categoria es obligatorio.');
+        RAISE_APPLICATION_ERROR(-20110, 'Tiene que haber un nombre de categoria');
     END IF;
     IF P_TIPO NOT IN ('ingreso','gasto','ahorro') THEN
-        RAISE_APPLICATION_ERROR(-20111, 'Tipo invalido. Valores: ingreso, gasto, ahorro.');
+        RAISE_APPLICATION_ERROR(-20111, 'Tipo invalido. Debe ser: ingreso, gasto, o ahorro.');
     END IF;
     IF P_ORDEN < 0 THEN
         RAISE_APPLICATION_ERROR(-20112, 'El orden no puede ser negativo.');
@@ -31,7 +30,6 @@ BEGIN
         NULL, P_NOMBRE, P_DESCRIPCION,
         P_TIPO, P_NOMBRE_ICON_UI, P_COLOR_HEX, P_ORDEN
     ) RETURNING ID_CATEGORIA INTO P_ID_GENERADO;
-    -- TRG_SUBCAT_DEFECTO crea la subcategoria "General" automaticamente aqui
     COMMIT;
 EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
@@ -40,11 +38,10 @@ EXCEPTION
 END SP_INSERTAR_CATEGORIA;
 /
 
--- >> READ (uno por ID)
--- ---------------------------------------------------------
+-- READ 
 CREATE OR REPLACE PROCEDURE SP_CONSULTAR_CATEGORIA (
     P_ID_CATEGORIA IN  CATEGORIA.ID_CATEGORIA%TYPE,
-    P_CURSOR       OUT SYS_REFCURSOR
+    P_CURSOR OUT SYS_REFCURSOR
 ) AS
 BEGIN
     OPEN P_CURSOR FOR
@@ -52,10 +49,9 @@ BEGIN
 END SP_CONSULTAR_CATEGORIA;
 /
 
--- >> READ (todos — P_TIPO = NULL retorna todas)
--- ---------------------------------------------------------
+-- >> READ ALL
 CREATE OR REPLACE PROCEDURE SP_LISTAR_CATEGORIAS (
-    P_TIPO   IN  VARCHAR2,
+    P_TIPO IN VARCHAR2,
     P_CURSOR OUT SYS_REFCURSOR
 ) AS
 BEGIN
@@ -70,28 +66,27 @@ BEGIN
 END SP_LISTAR_CATEGORIAS;
 /
 
--- >> UPDATE
--- ---------------------------------------------------------
+-- UPDATE
 CREATE OR REPLACE PROCEDURE SP_ACTUALIZAR_CATEGORIA (
     P_ID_CATEGORIA IN CATEGORIA.ID_CATEGORIA%TYPE,
-    P_NOMBRE       IN CATEGORIA.NOMBRE%TYPE,
-    P_DESCRIPCION  IN CATEGORIA.DESCRIPCION%TYPE,
-    P_COLOR_HEX    IN CATEGORIA.COLOR_HEX%TYPE,
-    P_ORDEN        IN CATEGORIA.ORDEN%TYPE
+    P_NOMBRE IN CATEGORIA.NOMBRE%TYPE,
+    P_DESCRIPCION IN CATEGORIA.DESCRIPCION%TYPE,
+    P_COLOR_HEX IN CATEGORIA.COLOR_HEX%TYPE,
+    P_ORDEN IN CATEGORIA.ORDEN%TYPE
 ) AS
 BEGIN
     IF TRIM(P_NOMBRE) IS NULL THEN
-        RAISE_APPLICATION_ERROR(-20110, 'El nombre de la categoria es obligatorio.');
+        RAISE_APPLICATION_ERROR(-20110, 'Tiene que haber un nombre de categoria');
     END IF;
     IF P_ORDEN < 0 THEN
         RAISE_APPLICATION_ERROR(-20112, 'El orden no puede ser negativo.');
     END IF;
 
     UPDATE CATEGORIA SET
-        NOMBRE      = P_NOMBRE,
+        NOMBRE = P_NOMBRE,
         DESCRIPCION = P_DESCRIPCION,
-        COLOR_HEX   = P_COLOR_HEX,
-        ORDEN       = P_ORDEN
+        COLOR_HEX = P_COLOR_HEX,
+        ORDEN = P_ORDEN
     WHERE ID_CATEGORIA = P_ID_CATEGORIA;
 
     IF SQL%ROWCOUNT = 0 THEN
@@ -103,21 +98,21 @@ EXCEPTION
 END SP_ACTUALIZAR_CATEGORIA;
 /
 
--- >> DELETE (no permitido si tiene transacciones asociadas)
--- ---------------------------------------------------------
+-- DELETE 
 CREATE OR REPLACE PROCEDURE SP_ELIMINAR_CATEGORIA (
     P_ID_CATEGORIA IN CATEGORIA.ID_CATEGORIA%TYPE
 ) AS
-    V_TIENE_TRX NUMBER;
+    TIENE_TRX NUMBER;
 BEGIN
-    SELECT COUNT(*) INTO V_TIENE_TRX
+    SELECT COUNT(*) INTO TIENE_TRX
     FROM   TRANSACCION T
     INNER JOIN   SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
     WHERE  S.ID_CATEGORIA = P_ID_CATEGORIA;
 
-    IF V_TIENE_TRX > 0 THEN
+    IF TIENE_TRX > 0 THEN
         RAISE_APPLICATION_ERROR(-20113,
-            'No se puede eliminar: la categoria tiene ' || V_TIENE_TRX || ' transaccion(es) asociada(s).');
+            'No se puede eliminar, tiene transacciones asociadas (' || TIENE_TRX || ')'
+        );
     END IF;
 
     DELETE FROM SUBCATEGORIA WHERE ID_CATEGORIA = P_ID_CATEGORIA;
