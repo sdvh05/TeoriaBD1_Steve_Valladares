@@ -2,6 +2,8 @@
 
 Interfaz de escritorio: **C# Windows Forms (.NET Framework 4.7.2)**
 
+Al ser **Permitido** se Desarrollo la UI, apoyandose de Inteligencia artificial
+
 ---
 
 ## 📁 Estructura
