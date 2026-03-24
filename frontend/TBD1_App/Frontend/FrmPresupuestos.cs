@@ -453,9 +453,6 @@ namespace TBD1_App.Frontend
             lblPeriodoPre.Text = $"Período: {p.PeriodoDescriptivo}   •   Creado: {p.FechaHoraCreacion:dd/MM/yyyy}";
             lblEstadoPre.Text  = p.EstadoPresupuesto.ToUpper();
             lblEstadoPre.ForeColor = p.EstadoPresupuesto == "activo" ? COLOR_ACT : COLOR_CER;
-            lblTotalesInfo.Text = $"Ingresos planeados: L {p.TotalIngresos:N2}   |   " +
-                                  $"Gastos planeados: L {p.TotalGastos:N2}   |   " +
-                                  $"Ahorro planeado: L {p.TotalAhorro:N2}";
 
             // Bloquear edición si está cerrado
             bool activo = p.EstadoPresupuesto == "activo";
@@ -469,6 +466,10 @@ namespace TBD1_App.Frontend
             {
                 var detalles = _dao.ObtenerDetalles(p.IdPresupuesto);
                 dgvDetalles.Rows.Clear();
+
+                // Calcular totales desde los detalles reales
+                decimal totalIngresos = 0, totalGastos = 0, totalAhorro = 0;
+
                 foreach (var d in detalles)
                 {
                     dgvDetalles.Rows.Add(
@@ -479,7 +480,20 @@ namespace TBD1_App.Frontend
                         d.Monto.ToString("N2"),
                         d.Justificacion ?? ""
                     );
+
+                    // Acumular por tipo
+                    switch (d.Tipo?.ToLower())
+                    {
+                        case "ingreso": totalIngresos += d.Monto; break;
+                        case "gasto":   totalGastos   += d.Monto; break;
+                        case "ahorro":  totalAhorro   += d.Monto; break;
+                    }
                 }
+
+                // Actualizar label con totales reales
+                lblTotalesInfo.Text = $"Ingresos planeados: L {totalIngresos:N2}   |   " +
+                                      $"Gastos planeados: L {totalGastos:N2}   |   " +
+                                      $"Ahorro planeado: L {totalAhorro:N2}";
             }
             catch (Exception ex)
             {
