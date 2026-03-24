@@ -125,8 +125,8 @@ namespace TBD1_App.Backend
                         C.NOMBRE AS NOMBRE_CATEGORIA,
                         C.TIPO
                 FROM    PRESUPUESTO_DETALLE D
-                JOIN    SUBCATEGORIA        S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN    CATEGORIA           C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN    SUBCATEGORIA        S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN    CATEGORIA           C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE   D.ID_PRESUPUESTO = :id
                 ORDER   BY C.TIPO, C.NOMBRE, S.NOMBRE",
                 new OracleParameter("id", idPresupuesto));

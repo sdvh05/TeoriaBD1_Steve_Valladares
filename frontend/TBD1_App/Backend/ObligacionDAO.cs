@@ -8,9 +8,7 @@ namespace TBD1_App.Backend
 {
     public class ObligacionDAO
     {
-        // ─────────────────────────────────────────
-        // Obtener obligaciones vigentes de un usuario
-        // ─────────────────────────────────────────
+
         public List<ObligacionFija> ObtenerActivas(string idUser)
         {
             var lista = new List<ObligacionFija>();
@@ -22,8 +20,8 @@ namespace TBD1_App.Backend
                         C.NOMBRE AS NOMBRE_CATEGORIA,
                         FN_DIAS_HASTA_VENCIMIENTO(O.ID_OBLIGACION) AS DIAS_VENCIMIENTO
                 FROM    OBLIGACION_FIJA O
-                JOIN    SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN    CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN    SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN    CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE   O.ID_USER = :id
                 AND     O.VIGENTE = 1
                 ORDER   BY O.DIA",
@@ -35,9 +33,6 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Obtener una obligación por ID
-        // ─────────────────────────────────────────
         public ObligacionFija ObtenerPorId(string idObligacion)
         {
             var dt = OracleHelper.ExecuteQuery(@"
@@ -48,8 +43,8 @@ namespace TBD1_App.Backend
                         C.NOMBRE AS NOMBRE_CATEGORIA,
                         FN_DIAS_HASTA_VENCIMIENTO(O.ID_OBLIGACION) AS DIAS_VENCIMIENTO
                 FROM    OBLIGACION_FIJA O
-                JOIN    SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN    CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN    SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN    CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE   O.ID_OBLIGACION = :id",
                 new OracleParameter("id", idObligacion));
 
@@ -57,10 +52,7 @@ namespace TBD1_App.Backend
             return MapearFila(dt.Rows[0]);
         }
 
-        // ─────────────────────────────────────────
-        // Insertar obligación fija
-        // Oracle genera el ID automaticamente (OUT)
-        // ─────────────────────────────────────────
+
         public string Insertar(ObligacionFija o)
         {
             var pIdGenerado = new OracleParameter("P_ID_GENERADO", OracleDbType.Varchar2, 10)
@@ -83,9 +75,7 @@ namespace TBD1_App.Backend
             return pIdGenerado.Value?.ToString();
         }
 
-        // ─────────────────────────────────────────
-        // Actualizar obligación fija
-        // ─────────────────────────────────────────
+
         public void Actualizar(ObligacionFija o)
         {
             OracleHelper.ExecuteProcedure("SP_ACTUALIZAR_OBLIGACION",
@@ -97,18 +87,14 @@ namespace TBD1_App.Backend
             );
         }
 
-        // ─────────────────────────────────────────
-        // Desactivar obligación (soft delete)
-        // ─────────────────────────────────────────
+
         public void Desactivar(string idObligacion)
         {
             OracleHelper.ExecuteProcedure("SP_ELIMINAR_OBLIGACION",
                 new OracleParameter("P_ID_OBLIGACION", idObligacion));
         }
 
-        // ─────────────────────────────────────────
-        // Mapeo DataRow → ObligacionFija
-        // ─────────────────────────────────────────
+
         private ObligacionFija MapearFila(DataRow row)
         {
             return new ObligacionFija

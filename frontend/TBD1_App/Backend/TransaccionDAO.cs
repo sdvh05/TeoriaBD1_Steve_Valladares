@@ -8,10 +8,7 @@ namespace TBD1_App.Backend
 {
     public class TransaccionDAO
     {
-        // ─────────────────────────────────────────
-        // Obtener transacciones de un presupuesto
-        // filtradas por año y mes
-        // ─────────────────────────────────────────
+
         public List<Transaccion> ObtenerPorMes(string idPresupuesto, int anio, int mes)
         {
             var lista = new List<Transaccion>();
@@ -24,8 +21,8 @@ namespace TBD1_App.Backend
                         S.NOMBRE AS NOMBRE_SUBCATEGORIA,
                         C.NOMBRE AS NOMBRE_CATEGORIA
                 FROM    TRANSACCION  T
-                JOIN    SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN    CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN    SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN    CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE   T.ID_PRESUPUESTO = :idP
                 AND     T.ANIO           = :anio
                 AND     T.MES            = :mes
@@ -40,10 +37,7 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Obtener transacciones filtradas por tipo
-        // tipo: 'ingreso' / 'gasto' / 'ahorro'
-        // ─────────────────────────────────────────
+
         public List<Transaccion> ObtenerPorTipo(string idPresupuesto, int anio, int mes, string tipo)
         {
             var lista = new List<Transaccion>();
@@ -56,8 +50,8 @@ namespace TBD1_App.Backend
                         S.NOMBRE AS NOMBRE_SUBCATEGORIA,
                         C.NOMBRE AS NOMBRE_CATEGORIA
                 FROM    TRANSACCION  T
-                JOIN    SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN    CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN    SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN    CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE   T.ID_PRESUPUESTO = :idP
                 AND     T.ANIO           = :anio
                 AND     T.MES            = :mes
@@ -74,10 +68,6 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Insertar transacción
-        // Oracle genera el ID automaticamente (OUT)
-        // ─────────────────────────────────────────
         public string Insertar(Transaccion t)
         {
             var pIdGenerado = new OracleParameter("P_ID_GENERADO", OracleDbType.Varchar2, 10)
@@ -104,9 +94,7 @@ namespace TBD1_App.Backend
             return pIdGenerado.Value?.ToString();
         }
 
-        // ─────────────────────────────────────────
-        // Actualizar transacción
-        // ─────────────────────────────────────────
+  
         public void Actualizar(Transaccion t)
         {
             OracleHelper.ExecuteProcedure("SP_ACTUALIZAR_TRANSACCION",
@@ -119,18 +107,14 @@ namespace TBD1_App.Backend
             );
         }
 
-        // ─────────────────────────────────────────
-        // Eliminar transacción
-        // ─────────────────────────────────────────
+     
         public void Eliminar(string idTransaccion)
         {
             OracleHelper.ExecuteProcedure("SP_ELIMINAR_TRANSACCION",
                 new OracleParameter("P_ID_TRANSACCION", idTransaccion));
         }
 
-        // ─────────────────────────────────────────
-        // Mapeo DataRow → Transaccion
-        // ─────────────────────────────────────────
+
         private Transaccion MapearFila(DataRow row)
         {
             return new Transaccion

@@ -67,8 +67,8 @@ namespace TBD1_App.Backend
                           AND  T2.TIPO = 'gasto'
                     ), 0), 2)                            AS PORCENTAJE
                 FROM TRANSACCION T
-                JOIN SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE T.ID_USER = :idUser
                   AND T.ANIO    = :anio
                   AND T.MES     = :mes
@@ -123,8 +123,8 @@ namespace TBD1_App.Backend
                          * 100.0 / NULLIF(D.MONTO, 0), 2)           AS PORCENTAJE_EJECUCION,
                     D.JUSTIFICACION
                 FROM PRESUPUESTO_DETALLE D
-                JOIN SUBCATEGORIA S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN SUBCATEGORIA S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE D.ID_PRESUPUESTO = :idPre
                 ORDER BY C.TIPO, C.NOMBRE, S.NOMBRE",
                 new OracleParameter("idPre2", idPresupuesto),
@@ -166,8 +166,8 @@ namespace TBD1_App.Backend
                     C.NOMBRE     AS NOMBRE_CATEGORIA,
                     SUM(T.MONTO) AS TOTAL_GASTADO
                 FROM TRANSACCION T
-                JOIN SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN SUBCATEGORIA S ON T.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN CATEGORIA    C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE T.ID_USER = :idUser
                   AND T.TIPO    = 'gasto'
                   AND (T.ANIO * 100 + T.MES) BETWEEN (:anioIni * 100 + :mesIni)
@@ -209,7 +209,7 @@ namespace TBD1_App.Backend
                     CASE
                         WHEN EXISTS (
                             SELECT 1 FROM OBLIGACION_TRANSACCION OT
-                            JOIN TRANSACCION T ON OT.ID_TRANSACCION = T.ID_TRANSACCION
+                            INNER JOIN TRANSACCION T ON OT.ID_TRANSACCION = T.ID_TRANSACCION
                             WHERE OT.ID_OBLIGACION = O.ID_OBLIGACION
                               AND T.ANIO = :anio AND T.MES = :mes
                         ) THEN 'PAGADA'
@@ -219,13 +219,13 @@ namespace TBD1_App.Backend
                     END                                         AS ESTADO_PAGO,
                     (SELECT MAX(T2.FECHA_TRANSACCION)
                      FROM OBLIGACION_TRANSACCION OT2
-                     JOIN TRANSACCION T2 ON OT2.ID_TRANSACCION = T2.ID_TRANSACCION
+                     INNER JOIN TRANSACCION T2 ON OT2.ID_TRANSACCION = T2.ID_TRANSACCION
                      WHERE OT2.ID_OBLIGACION = O.ID_OBLIGACION) AS FECHA_ULTIMO_PAGO,
                     O.FECHA_INICIO,
                     O.FECHA_FIN
                 FROM OBLIGACION_FIJA O
-                JOIN SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN SUBCATEGORIA    S ON O.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN CATEGORIA       C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
                 WHERE O.ID_USER = :idUser
                   AND O.VIGENTE = 1
                 ORDER BY O.DIA",
@@ -285,9 +285,9 @@ namespace TBD1_App.Backend
                     P.ANIO_FIN,
                     P.MES_FIN
                 FROM PRESUPUESTO_DETALLE D
-                JOIN SUBCATEGORIA        S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
-                JOIN CATEGORIA           C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
-                JOIN PRESUPUESTO         P ON D.ID_PRESUPUESTO  = P.ID_PRESUPUESTO
+                INNER JOIN SUBCATEGORIA        S ON D.ID_SUBCATEGORIA = S.ID_SUBCATEGORIA
+                INNER JOIN CATEGORIA           C ON S.ID_CATEGORIA    = C.ID_CATEGORIA
+                INNER JOIN PRESUPUESTO         P ON D.ID_PRESUPUESTO  = P.ID_PRESUPUESTO
                 WHERE D.ID_PRESUPUESTO = :idPre
                   AND C.TIPO = 'ahorro'
                 ORDER BY PORCENTAJE_COMPLETADO DESC",

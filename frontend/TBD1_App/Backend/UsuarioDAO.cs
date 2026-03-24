@@ -8,9 +8,7 @@ namespace TBD1_App.Backend
 {
     public class UsuarioDAO
     {
-        // ─────────────────────────────────────────
-        // Obtener todos los usuarios activos
-        // ─────────────────────────────────────────
+
         public List<Usuario> ObtenerTodos()
         {
             var lista = new List<Usuario>();
@@ -23,9 +21,7 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Obtener un usuario por ID
-        // ─────────────────────────────────────────
+
         public Usuario ObtenerPorId(string idUser)
         {
             var dt = OracleHelper.ExecuteQuery(
@@ -36,9 +32,7 @@ namespace TBD1_App.Backend
             return MapearFila(dt.Rows[0]);
         }
 
-        // ─────────────────────────────────────────
-        // Login — busca por correo y password
-        // ─────────────────────────────────────────
+
         public Usuario Login(string correo, string password)
         {
             var dt = OracleHelper.ExecuteQuery(
@@ -50,10 +44,7 @@ namespace TBD1_App.Backend
             return MapearFila(dt.Rows[0]);
         }
 
-        // ─────────────────────────────────────────
-        // Insertar nuevo usuario
-        // Oracle genera el ID automaticamente (OUT)
-        // ─────────────────────────────────────────
+
         public string Insertar(Usuario u)
         {
             var pIdGenerado = new OracleParameter("P_ID_GENERADO", OracleDbType.Varchar2, 10)
@@ -75,9 +66,7 @@ namespace TBD1_App.Backend
             return pIdGenerado.Value?.ToString();
         }
 
-        // ─────────────────────────────────────────
-        // Actualizar usuario existente
-        // ─────────────────────────────────────────
+
         public void Actualizar(Usuario u)
         {
             OracleHelper.ExecuteProcedure("SP_ACTUALIZAR_USUARIO",
@@ -90,18 +79,13 @@ namespace TBD1_App.Backend
             );
         }
 
-        // ─────────────────────────────────────────
-        // Desactivar usuario (soft delete)
-        // ─────────────────────────────────────────
+  
         public void Eliminar(string idUser)
         {
             OracleHelper.ExecuteProcedure("SP_ELIMINAR_USUARIO",
                 new OracleParameter("P_ID_USER", idUser));
         }
 
-        // ─────────────────────────────────────────
-        // Mapeo DataRow → Usuario
-        // ─────────────────────────────────────────
         private Usuario MapearFila(DataRow row)
         {
             return new Usuario

@@ -8,9 +8,7 @@ namespace TBD1_App.Backend
 {
     public class CategoriaDAO
     {
-        // ─────────────────────────────────────────
-        // Obtener todas las categorías
-        // ─────────────────────────────────────────
+  
         public List<Categoria> ObtenerTodas()
         {
             var lista = new List<Categoria>();
@@ -23,10 +21,6 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Obtener categorías filtradas por tipo
-        // tipo: 'ingreso' / 'gasto' / 'ahorro'
-        // ─────────────────────────────────────────
         public List<Categoria> ObtenerPorTipo(string tipo)
         {
             var lista = new List<Categoria>();
@@ -40,11 +34,6 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Insertar categoría
-        // Oracle genera el ID automaticamente (OUT)
-        // TRG_SUBCAT_DEFECTO crea "General" automaticamente
-        // ─────────────────────────────────────────
         public string Insertar(Categoria c)
         {
             var pIdGenerado = new OracleParameter("P_ID_GENERADO", OracleDbType.Varchar2, 10)
@@ -65,9 +54,7 @@ namespace TBD1_App.Backend
             return pIdGenerado.Value?.ToString();
         }
 
-        // ─────────────────────────────────────────
-        // Actualizar categoría
-        // ─────────────────────────────────────────
+ 
         public void Actualizar(Categoria c)
         {
             OracleHelper.ExecuteProcedure("SP_ACTUALIZAR_CATEGORIA",
@@ -79,18 +66,14 @@ namespace TBD1_App.Backend
             );
         }
 
-        // ─────────────────────────────────────────
-        // Eliminar categoría
-        // ─────────────────────────────────────────
+
         public void Eliminar(string idCategoria)
         {
             OracleHelper.ExecuteProcedure("SP_ELIMINAR_CATEGORIA",
                 new OracleParameter("P_ID_CATEGORIA", idCategoria));
         }
 
-        // ─────────────────────────────────────────
-        // Obtener subcategorías activas de una categoría
-        // ─────────────────────────────────────────
+
         public List<Subcategoria> ObtenerSubcategorias(string idCategoria)
         {
             var lista = new List<Subcategoria>();
@@ -101,7 +84,7 @@ namespace TBD1_App.Backend
                         C.NOMBRE AS NOMBRE_CATEGORIA,
                         C.TIPO   AS TIPO_CATEGORIA
                 FROM    SUBCATEGORIA S
-                JOIN    CATEGORIA    C ON S.ID_CATEGORIA = C.ID_CATEGORIA
+                INNER JOIN    CATEGORIA    C ON S.ID_CATEGORIA = C.ID_CATEGORIA
                 WHERE   S.ID_CATEGORIA = :id
                 AND     S.ACTIVA = 1
                 ORDER   BY S.SUB_POR_DEFECTO DESC, S.NOMBRE",
@@ -113,10 +96,7 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Obtener TODAS las subcategorías activas
-        // Útil para combos en Transaccion
-        // ─────────────────────────────────────────
+   
         public List<Subcategoria> ObtenerTodasSubcategorias()
         {
             var lista = new List<Subcategoria>();
@@ -127,7 +107,7 @@ namespace TBD1_App.Backend
                         C.NOMBRE AS NOMBRE_CATEGORIA,
                         C.TIPO   AS TIPO_CATEGORIA
                 FROM    SUBCATEGORIA S
-                JOIN    CATEGORIA    C ON S.ID_CATEGORIA = C.ID_CATEGORIA
+                INNER JOIN    CATEGORIA    C ON S.ID_CATEGORIA = C.ID_CATEGORIA
                 WHERE   S.ACTIVA = 1
                 ORDER   BY C.TIPO, C.NOMBRE, S.NOMBRE");
 
@@ -137,10 +117,7 @@ namespace TBD1_App.Backend
             return lista;
         }
 
-        // ─────────────────────────────────────────
-        // Insertar subcategoría
-        // Oracle genera el ID automaticamente (OUT)
-        // ─────────────────────────────────────────
+
         public string InsertarSubcategoria(Subcategoria s)
         {
             var pIdGenerado = new OracleParameter("P_ID_GENERADO", OracleDbType.Varchar2, 10)
@@ -158,9 +135,7 @@ namespace TBD1_App.Backend
             return pIdGenerado.Value?.ToString();
         }
 
-        // ─────────────────────────────────────────
-        // Actualizar subcategoría
-        // ─────────────────────────────────────────
+
         public void ActualizarSubcategoria(Subcategoria s)
         {
             OracleHelper.ExecuteProcedure("SP_ACTUALIZAR_SUBCATEGORIA",
@@ -170,18 +145,13 @@ namespace TBD1_App.Backend
             );
         }
 
-        // ─────────────────────────────────────────
-        // Desactivar subcategoría (soft delete)
-        // ─────────────────────────────────────────
         public void EliminarSubcategoria(string idSubcategoria)
         {
             OracleHelper.ExecuteProcedure("SP_ELIMINAR_SUBCATEGORIA",
                 new OracleParameter("P_ID_SUBCATEGORIA", idSubcategoria));
         }
 
-        // ─────────────────────────────────────────
-        // Mapeo DataRow → Categoria
-        // ─────────────────────────────────────────
+
         private Categoria MapearCategoria(DataRow row)
         {
             return new Categoria
@@ -196,9 +166,7 @@ namespace TBD1_App.Backend
             };
         }
 
-        // ─────────────────────────────────────────
-        // Mapeo DataRow → Subcategoria
-        // ─────────────────────────────────────────
+
         private Subcategoria MapearSubcategoria(DataRow row)
         {
             return new Subcategoria

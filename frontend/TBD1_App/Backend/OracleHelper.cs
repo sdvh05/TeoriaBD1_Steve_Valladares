@@ -13,9 +13,7 @@ namespace TBD1_App.Backend
             "User Id=system;" +
             "Password=OracleTBD;";
 
-        // ─────────────────────────────────────────
-        // Abre y devuelve una conexión a Oracle
-        // ─────────────────────────────────────────
+        // Abre y devuelve una conexion a Oracle
         public static OracleConnection GetConnection()
         {
             var conn = new OracleConnection(ConnectionString);
@@ -23,9 +21,8 @@ namespace TBD1_App.Backend
             return conn;
         }
 
-        // ─────────────────────────────────────────
-        // Ejecuta un SELECT y devuelve un DataTable
-        // ─────────────────────────────────────────
+        
+        // Ejecuta un SELECT con Return
         public static DataTable ExecuteQuery(string sql, params OracleParameter[] parameters)
         {
             using (var conn = GetConnection())
@@ -42,9 +39,8 @@ namespace TBD1_App.Backend
             }
         }
 
-        // ─────────────────────────────────────────
-        // Ejecuta un SP sin valor de retorno
-        // ─────────────────────────────────────────
+
+        // SP sin Return (void)
         public static void ExecuteProcedure(string procedureName, params OracleParameter[] parameters)
         {
             using (var conn = GetConnection())
@@ -58,10 +54,7 @@ namespace TBD1_App.Backend
             }
         }
 
-        // ─────────────────────────────────────────
-        // Ejecuta un SP y retorna el parámetro OUT
-        // Usado para INSERTs que retornan el ID generado
-        // ─────────────────────────────────────────
+        // Ejecuta un SP con Return
         public static string ExecuteProcedureWithOutput(string procedureName, params OracleParameter[] parameters)
         {
             using (var conn = GetConnection())
@@ -78,10 +71,8 @@ namespace TBD1_App.Backend
             }
         }
 
-        // ─────────────────────────────────────────
-        // Ejecuta un SELECT y devuelve un solo valor
-        // Útil para COUNT, SUM, funciones Oracle
-        // ─────────────────────────────────────────
+ 
+        // Funciones Count / Sum
         public static object ExecuteScalar(string sql, params OracleParameter[] parameters)
         {
             using (var conn = GetConnection())
@@ -95,10 +86,7 @@ namespace TBD1_App.Backend
             }
         }
 
-        // ─────────────────────────────────────────
-        // Prueba si la conexión funciona
-        // Llamar al iniciar la aplicación
-        // ─────────────────────────────────────────
+        //test 
         public static bool TestConnection()
         {
             try
