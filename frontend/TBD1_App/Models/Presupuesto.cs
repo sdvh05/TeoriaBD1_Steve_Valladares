@@ -1,5 +1,5 @@
 ﻿using System;
-namespace TBD1_Proyecto.Models
+namespace TBD1_App.Models
 
 {
     public class Presupuesto
@@ -17,7 +17,7 @@ namespace TBD1_Proyecto.Models
         public DateTime FechaHoraCreacion { get; set; }
         public string EstadoPresupuesto { get; set; }  // activo / cerrado / borrador
 
-        // Propiedad calculada — útil para mostrar en combos
+       
         public string PeriodoDescriptivo =>
             $"{NombreDescriptivo} ({MesInicio}/{AnioInicio} - {MesFin}/{AnioFin})";
     }

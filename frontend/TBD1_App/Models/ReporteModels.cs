@@ -2,7 +2,7 @@ using System;
 
 namespace TBD1_App.Models
 {
-    // ── Reporte 1: Balance mensual ─────────────────────────
+    // Reporte 1
     public class ReporteBalanceMes
     {
         public int     Anio          { get; set; }
@@ -14,7 +14,7 @@ namespace TBD1_App.Models
         public string  NombreMes     => new DateTime(Anio, Mes, 1).ToString("MMMM yyyy");
     }
 
-    // ── Reporte 2: Gastos por categoría ───────────────────
+    // Reporte 2
     public class ReporteGastoCategoria
     {
         public string  IdCategoria      { get; set; }
@@ -24,7 +24,7 @@ namespace TBD1_App.Models
         public decimal Porcentaje       { get; set; }
     }
 
-    // ── Reporte 3: Cumplimiento presupuesto ───────────────
+    // Reporte 3
     public class ReporteCumplimiento
     {
         public string  NombreCategoria    { get; set; }
@@ -42,7 +42,7 @@ namespace TBD1_App.Models
             PorcentajeEjecucion <= 100 ? "Amarillo" : "Rojo";
     }
 
-    // ── Reporte 4: Tendencia gastos ───────────────────────
+    // Reporte 4
     public class ReporteTendencia
     {
         public int     Anio            { get; set; }
@@ -53,7 +53,7 @@ namespace TBD1_App.Models
         public string  Periodo         => new DateTime(Anio, Mes, 1).ToString("MMM yy");
     }
 
-    // ── Reporte 5: Estado obligaciones ────────────────────
+    // Reporte 5
     public class ReporteObligacion
     {
         public string   IdObligacion      { get; set; }
@@ -69,7 +69,7 @@ namespace TBD1_App.Models
         public DateTime?FechaFin          { get; set; }
     }
 
-    // ── Reporte 6: Progreso ahorro ────────────────────────
+    // Reporte 6
     public class ReporteProgresoAhorro
     {
         public string  IdSubcategoria        { get; set; }
